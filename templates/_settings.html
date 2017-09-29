@@ -2,50 +2,22 @@
 
 {{ forms.textField({
 	first:        true,
-	label:        "Bucket Region"|t,
+	label:        "Azure Storage Connection String"|t,
 	required:     true,
-	id:           'bucketRegion',
-	name:         'bucketRegion',
-	instructions: "The AWS region associated with your bucket e.g. us-east-1."|t,
-	value:        settings.bucketRegion,
+	id:           'connectionString',
+	name:         'connectionString',
+	instructions: "The connection string for your Azure Storage account."|t,
+	value:        settings.connectionString,
 	autofocus:    true,
-	errors:       settings.getErrors('bucketRegion')
+	errors:       settings.getErrors('connectionString')
 }) }}
 
 {{ forms.textField({
-	label:        "Bucket Name"|t,
+	label:        "Blob Container Name"|t,
 	required:     true,
-	id:           'bucketName',
-	name:         'bucketName',
-	instructions: "The name of your AWS S3 bucket."|t,
-	value:        settings.bucketName,
-	errors:       settings.getErrors('bucketName')
-}) }}
-
-{{ forms.textField({
-	label:        "Bucket Path"|t,
-	required:     false,
-	id:           'bucketPath',
-	name:         'bucketPath',
-	instructions: "The subdirectory to upload your assets to. Leave blank to upload to the root of your S3 bucket."|t,
-	value:        settings.bucketPath,
-	errors:       settings.getErrors('bucketPath')
-}) }}
-
-{{ forms.textField({
-	label:        "AWS Key"|t,
-	id:           'awsKey',
-	name:         'awsKey',
-	instructions: "AWS IAM user key. If left blank then then AWS SDK will try and use your instance metadata to authenticate."|t,
-	value:        settings.awsKey,
-	errors:       settings.getErrors('awsKey')
-}) }}
-
-{{ forms.textField({
-	label:        "AWS Secret"|t,
-	id:           "awsSecret",
-	name:         "awsSecret",
-	instructions: "AWS IAM user secret. If left blank then then AWS SDK will try and use your instance metadata to authenticate."|t,
-	value:        settings.awsSecret,
-	errors:       settings.getErrors('awsSecret')
+	id:           'container',
+	name:         'container',
+	instructions: "The name of your blob container."|t,
+	value:        settings.container,
+	errors:       settings.getErrors('container')
 }) }}

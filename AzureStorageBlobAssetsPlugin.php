@@ -1,23 +1,49 @@
 <?php
 
 /*
- * This file is part of the AWS S3 Assets plugin.
+ * This file is part of the Azure Storage Blob Assets plugin.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
+ * Forked from AWS S3 Assets plugin by JonnyW\AWSS3Assets
  */
 namespace Craft;
 
 use Craft\Exception as CraftException;
-use JonnyW\AWSS3Assets\S3Bucket;
-use JonnyW\AWSS3Assets\Model\Settings;
+use UsmanMohammad\AzureStorageBlobAssets\BlobContainer;
+use UsmanMohammad\AzureStorageBlobAssets\Model\Settings;
+use MicrosoftAzure\Storage\Blob\Models\CreateContainerOptions;
+use MicrosoftAzure\Storage\Blob\Models\PublicAccessType;
+use MicrosoftAzure\Storage\Blob\Models\ListContainersResult;
+use MicrosoftAzure\Storage\Blob\Models\DeleteBlobOptions;
+use MicrosoftAzure\Storage\Blob\Models\CreateBlobOptions;
+use MicrosoftAzure\Storage\Blob\Models\GetBlobOptions;
+use MicrosoftAzure\Storage\Blob\Models\ContainerACL;
+use MicrosoftAzure\Storage\Blob\Models\SetBlobPropertiesOptions;
+use MicrosoftAzure\Storage\Blob\Models\ListPageBlobRangesOptions;
+use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
+use MicrosoftAzure\Storage\Common\Exceptions\InvalidArgumentTypeException;
+use MicrosoftAzure\Storage\Common\Internal\Resources;
+use MicrosoftAzure\Storage\Common\Internal\StorageServiceSettings;
+use MicrosoftAzure\Storage\Common\Models\Range;
+use MicrosoftAzure\Storage\Common\Models\Logging;
+use MicrosoftAzure\Storage\Common\Models\Metrics;
+use MicrosoftAzure\Storage\Common\Models\RetentionPolicy;
+use MicrosoftAzure\Storage\Common\Models\ServiceProperties;
+use MicrosoftAzure\Storage\Common\SharedAccessSignatureHelper;
+use MicrosoftAzure\Storage\Common\ServicesBuilder;
+
+
 
 /**
- * AWS S3 Assets
+ * Azure Storage Blob Assets
  *
- * @author Jon Wenmoth <contact@jonnyw.me>
+ * @author Usman Mohammad <contact@usman.mx>
+ *
+ * Forked from Jon Wenmoth <contact@jonnyw.me>
  */
-class AWSS3AssetsPlugin extends BasePlugin
+class AzureStorageBlobAssetsPlugin extends BasePlugin
 {
     /**
      * Internal constructor
@@ -43,7 +69,7 @@ class AWSS3AssetsPlugin extends BasePlugin
      */
     public function getName()
     {
-         return Craft::t('AWS S3 Assets');
+         return Craft::t('Azure Storage Blob Assets Plugin');
     }
 
     /**
@@ -54,7 +80,7 @@ class AWSS3AssetsPlugin extends BasePlugin
      */
     public function getVersion()
     {
-        return '1.2.0';
+        return '1.0.0';
     }
 
     /**
@@ -65,7 +91,7 @@ class AWSS3AssetsPlugin extends BasePlugin
      */
     public function getDeveloper()
     {
-        return 'JonnyW';
+        return 'UsmanMohammad';
     }
 
     /**
@@ -76,7 +102,7 @@ class AWSS3AssetsPlugin extends BasePlugin
      */
     public function getDeveloperUrl()
     {
-        return 'http://www.jonnyw.me';
+        return 'https://github.com/usmanmohammad';
     }
 
     /**
@@ -87,7 +113,7 @@ class AWSS3AssetsPlugin extends BasePlugin
      */
     public function getDocumentationUrl()
     {
-        return 'https://github.com/jonnnnyw/craft-awss3assets/blob/master/README.md';
+        return 'https://github.com/usmanmohammad/craft-azurestorage/blob/master/README.md';
     }
 
     /**
@@ -98,7 +124,7 @@ class AWSS3AssetsPlugin extends BasePlugin
      */
     public function getReleaseFeedUrl()
     {
-        return 'https://raw.githubusercontent.com/jonnnnyw/craft-awss3assets/master/release.json';
+        return 'https://raw.githubusercontent.com/usmanmohammad/craft-azurestorage/master/release.json';
     }
 
     /**
@@ -110,12 +136,12 @@ class AWSS3AssetsPlugin extends BasePlugin
      */
     public function onBeforeInstall()
     {
-        if (!class_exists('\JonnyW\AWSS3Assets\S3Bucket')) {
+        if (!class_exists('UsmanMohammad\AzureStorageBlobAssets\BlobContainer')) {
 
             $autoload = realpath(dirname(__FILE__)) . '/../../../vendor/autoload.php';
 
             throw new CraftException(
-                Craft::t('AWSS3AssetsPlugin could not locate an autoload file in {path}.', array('path' => $autoload))
+                Craft::t('AzureStorageBlobPlugin could not locate an autoload file in {path}.', array('path' => $autoload))
             );
         }
     }
@@ -145,7 +171,7 @@ class AWSS3AssetsPlugin extends BasePlugin
      * Get settings model.
      *
      * @access protected
-     * @return \JonnyW\AWSS3Assets\Model\Settings
+     * @return \UsmanMohammad\AzureStorageBlobAssets\Model\Settings
      */
     protected function getSettingsModel()
     {
@@ -161,22 +187,22 @@ class AWSS3AssetsPlugin extends BasePlugin
      */
     public function getSettingsHtml()
     {
-       return craft()->templates->render('awss3assets/_settings', array(
+       return craft()->templates->render('azurestorageblobassets/_settings', array(
            'settings' => $this->getSettings()
        ));
     }
 
     /**
-     * Get S3 Bucket instance.
+     * Get Azure Blob instance.
      *
      * @access private
-     * @return \JonnyW\AWSS3Assets\S3Bucket
+     * @return \UsmanMohammad\AzureStorageBlobAssets\BlobContainer
      */
-    private function getS3Bucket()
+    private function getBlobContainer()
     {
         $settings = $this->getSettings();
 
-        $bucket = S3Bucket::getInstance(
+        $container = BlobContainer::getInstance(
             $settings->bucketRegion,
             $settings->bucketName,
             $settings->awsKey,
@@ -199,7 +225,7 @@ class AWSS3AssetsPlugin extends BasePlugin
         $settings = $this->getSettings();
         
         try {
-            $this->getS3Bucket()->cp($this->getAssetPath($asset), trim($settings->bucketPath . '/' . $asset->filename, '/'));
+            $this->getBlobContainer()->copy($this->getAssetPath($asset), trim($asset->getFolder()->path . $asset->filename, '/'));
         } catch (\Exception $e) {
             throw new CraftException($e->getMessage());
         }
@@ -218,7 +244,7 @@ class AWSS3AssetsPlugin extends BasePlugin
         $settings = $this->getSettings();
         
         try {
-            $this->getS3Bucket()->rm(trim($settings->bucketPath . '/' . $asset->filename, '/'));
+            $this->getBlobContainer()->remove(trim($asset->getFolder()->path . $asset->filename, '/'));
         } catch (\Exception $e) {
             throw new CraftException($e->getMessage());
         }

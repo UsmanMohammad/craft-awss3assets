@@ -82,12 +82,12 @@ class S3BucketTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\JonnyW\AWSS3Assets\Exception\ObjectNotFoundException');
 
         $bucket = S3Bucket::getInstance('us-east-1', 'test.jonnyw.me');
-        $bucket->cp(
+        $bucket->copy(
             $this->getFilePath(),
             $this->getFileName()
         );
 
-        $bucket->rm($this->getFileName());
+        $bucket->remove($this->getFileName());
         $bucket->get($this->getFileName());
     }
 }
