@@ -33,7 +33,7 @@ class BlobContainerTest extends \PHPUnit_Framework_TestCase
             'test.jonnyw.me'
         );
 
-        $this->assertInstanceOf('\UsmanMohamamd\AzureStorageBlobAssets\BlobContainer', $bucket);
+        $this->assertInstanceOf('\UsmanMohammad\AzureStorageBlobAssets\BlobContainer', $bucket);
     }
 
     // /**

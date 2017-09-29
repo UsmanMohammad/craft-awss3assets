@@ -8,13 +8,13 @@
         {
             "name": "Usman Mohammad",
             "email": "contact@usman.mx",
-            "homepage": "https://github.com/usmanmohammad/craft-azurestorage"
+            "homepage": "https://github.com/usmanmohammad/craft-azurestorageblobassets"
         }
     ],
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "JonnyW\\AWSS3Assets\\": "src/JonnyW/AWSS3Assets/"
+            "UsmanMohammad\\AzureStorageBlobAssets\\": "src/UsmanMohammad/AzureStorageBlobAssets/"
         }
     },
     "autoload-dev": {

@@ -203,10 +203,8 @@ class AzureStorageBlobAssetsPlugin extends BasePlugin
         $settings = $this->getSettings();
 
         $container = BlobContainer::getInstance(
-            $settings->bucketRegion,
-            $settings->bucketName,
-            $settings->awsKey,
-            $settings->awsSecret
+            $settings->connectionString,
+            $settings->container
         );
 
         return $bucket;

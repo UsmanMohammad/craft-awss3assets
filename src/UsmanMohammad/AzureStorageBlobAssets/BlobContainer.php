@@ -74,8 +74,15 @@ class BlobContainer
     {
         if (!self::$instance instanceof \UsmanMohammad\AzureStorageBlobAssets\BlobContainer) {
 
-            $client = ServicesBuilder::getInstance()->createBlobService($connectionString);
-
+            $serviceBuilder = ServicesBuilder::getInstance();
+            try{
+                $serviceBuilder->createBlobService($connectionString);                
+            }
+            catch(\Exception $e)
+            {
+               
+            }
+            $client = $serviceBuilder;
             self::$instance = new static(
                 $client,
                 $container
