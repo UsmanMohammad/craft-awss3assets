@@ -37,7 +37,7 @@ class BlobContainerTest extends \PHPUnit_Framework_TestCase
             $this->getFileName()
         );
 
-        $this->assertInstanceOf('\Aws\Result', $container->get($this->getFileName()));
+        $this->assertInstanceOf('MicrosoftAzure\Storage\Blob\Models\GetBlobResult', $container->get($this->getFileName()));
     }
 
     /**
@@ -72,7 +72,7 @@ class BlobContainerTest extends \PHPUnit_Framework_TestCase
             $file
         );
 
-        $this->assertInstanceOf('\Aws\Result', $container->get($file));
+        $this->assertInstanceOf('MicrosoftAzure\Storage\Blob\Models\GetBlobResult', $container->get($file));
     }
 
     /**
