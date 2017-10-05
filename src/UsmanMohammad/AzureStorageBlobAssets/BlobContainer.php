@@ -83,8 +83,7 @@ class BlobContainer
                     $container
                 );                
             }
-            catch(\Exception $e)
-            {
+            catch(\Exception $e){
                throw $e;
             }
 

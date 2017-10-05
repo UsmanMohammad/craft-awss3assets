@@ -36,19 +36,19 @@ class BlobContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\UsmanMohammad\AzureStorageBlobAssets\BlobContainer', $container);
     }
 
-    // /**
-    //  * Test can get container instance
-    //  * without credentials
-    //  *
-    //  * @return void
-    //  */
-    // public function testCanGetContainerInstanceWithoutCredentials()
-    // {
-    //     $container = BlobContainer::getInstance(
-    //         '',
-    //         ''
-    //     );
+    /**
+     * Test can get container instance
+     * without credentials
+     *
+     * @return void
+     */
+    public function testCannotGetInstanceIfConnectionStringNotProvided()
+    {
+        $this->setExpectedException('\Exception');
 
-    //     $this->assertInstanceOf('\UsmanMohammad\AzureStorageBlobAssets\BlobContainer', $container);
-    // }
+        $container = BlobContainer::getInstance(
+            '',
+            ''
+        );
+    }
 }
