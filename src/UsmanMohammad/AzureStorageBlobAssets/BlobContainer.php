@@ -13,6 +13,7 @@ namespace UsmanMohammad\AzureStorageBlobAssets;
 use UsmanMohammad\AzureStorageBlobAssets\Exception\ObjectNotFoundException;
 use MicrosoftAzure\Storage\Common\ServicesBuilder;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
+use MicrosoftAzure\Storage\Blob\BlobRestProxy; 
 
 /**
  * Azure Storage Blob Assets
@@ -34,7 +35,7 @@ class BlobContainer
     /**
      * AzureStorage client
      *
-     * @var \MicrosoftAzure\Storage\Common\ServicesBuilder
+     * @var \MicrosoftAzure\Storage\Blob\BlobRestProxy
      * @access protected
      */
     protected $client;
@@ -51,10 +52,10 @@ class BlobContainer
      * Internal constructor.
      *
      * @access public
-     * @param \MicrosoftAzure\Storage\Common\ServicesBuilder $client
+     * @param \MicrosoftAzure\Storage\Blob\BlobRestProxy $client
      * @param string                    $name
      */
-    public function __construct(ServicesBuilder $client, $name)
+    public function __construct(BlobRestProxy $client, $name)
     {
         $this->client = $client;
         $this->name   = $name;
@@ -76,17 +77,17 @@ class BlobContainer
 
             $serviceBuilder = ServicesBuilder::getInstance();
             try{
-                $serviceBuilder->createBlobService($connectionString);                
+                $client = $serviceBuilder->createBlobService($connectionString);
+                self::$instance = new static(
+                    $client,
+                    $container
+                );                
             }
             catch(\Exception $e)
             {
-               
+               throw $e;
             }
-            $client = $serviceBuilder;
-            self::$instance = new static(
-                $client,
-                $container
-            );
+
         }
 
         return self::$instance;
@@ -107,7 +108,7 @@ class BlobContainer
         }
         
         $content = fopen($path, 'r');
-        $result = $blobClient->createBlockBlob($this->name, $filename, $content);
+        $result = $this->client->createBlockBlob($this->name, $filename, $content);
         return $result;
     }
 
@@ -130,11 +131,23 @@ class BlobContainer
      * @access public
      * @param  string $filename
      * @return \MicrosoftAzure\Storage\Models\GetBlobResult
+     * @throws \MicrosoftAzure\Storage\Common\Exceptions\ServiceException
+     * @throws \UsmanMohammad\AzureStorageBlobAssets\Exception\ObjectNotFoundException
      */
     public function get($filename)
     {
-        $result = $this->client
-            ->getBlob($this->name, $filename);
+        try {
+            $result = $this->client
+                ->getBlob($this->name, $filename);
+        }
+        catch (\MicrosoftAzure\Storage\Common\Exceptions\ServiceException $e){
+
+            if ( $e->getResponse()->getStatusCode() == '404'){
+                throw new ObjectNotFoundException($e->getErrorMessage());
+            }
+            throw $e;
+        }
+
         return $result;
     }
 }

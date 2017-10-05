@@ -31,7 +31,9 @@ class BlobContainerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanCopyNewMediaToBlobContainer()
     {
-        $container = BlobContainer::getInstance('us-east-1', 'tests.jonnyw.me');
+        $container = BlobContainer::getInstance(
+            '<insertConnectionString>', 
+            '<insertContainerName>');
         $container->copy(
             $this->getFilePath(),
             $this->getFileName()
@@ -48,7 +50,9 @@ class BlobContainerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanOverwriteExistingMediaInBlobContainer()
     {
-        $container = BlobContainer::getInstance('us-east-1', 'tests.jonnyw.me');
+        $container = BlobContainer::getInstance(
+            '<insertConnectionString>', 
+            '<insertContainerName>');
 
         $path = $this->getFilePath();
         $name = $this->getFileName();
@@ -66,7 +70,9 @@ class BlobContainerTest extends \PHPUnit_Framework_TestCase
     {
         $file = 'assets/' . $this->getFileName();
 
-        $container = BlobContainer::getInstance('us-east-1', 'tests.jonnyw.me');
+        $container = BlobContainer::getInstance(
+            '<insertConnectionString>', 
+            '<insertContainerName>');
         $container->copy(
             $this->getFilePath(),
             $file
@@ -85,7 +91,9 @@ class BlobContainerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\UsmanMohammad\AzureStorageBlobAssets\Exception\ObjectNotFoundException');
 
-        $container = BlobContainer::getInstance('us-east-1', 'test.jonnyw.me');
+        $container = BlobContainer::getInstance(
+            '<insertConnectionString>', 
+            '<insertContainerName>');
         $container->copy(
             $this->getFilePath(),
             $this->getFileName()

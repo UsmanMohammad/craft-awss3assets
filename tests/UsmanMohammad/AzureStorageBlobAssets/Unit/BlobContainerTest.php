@@ -22,33 +22,33 @@ use UsmanMohammad\AzureStorageBlobAssets\BlobContainer;
 class BlobContainerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Test can get bucket instance
+     * Test can get container instance
      *
      * @return void
      */
-    public function testCanGetBucketInstance()
+    public function testCanGetContainerInstance()
     {
-        $bucket = BlobContainer::getInstance(
-            'us-east-1',
-            'test.jonnyw.me'
+        $container = BlobContainer::getInstance(
+            '<insertConnectionString>', 
+            '<insertContainerName>'
         );
 
-        $this->assertInstanceOf('\UsmanMohammad\AzureStorageBlobAssets\BlobContainer', $bucket);
+        $this->assertInstanceOf('\UsmanMohammad\AzureStorageBlobAssets\BlobContainer', $container);
     }
 
     // /**
-    //  * Test can get bucket instance
+    //  * Test can get container instance
     //  * without credentials
     //  *
     //  * @return void
     //  */
-    // public function testCanGetBucketInstanceWithoutCredentials()
+    // public function testCanGetContainerInstanceWithoutCredentials()
     // {
-    //     $bucket = BlobContainer::getInstance(
-    //         'us-east-1',
-    //         'test.jonnyw.me'
+    //     $container = BlobContainer::getInstance(
+    //         '',
+    //         ''
     //     );
 
-    //     $this->assertInstanceOf('\Jonnyw\AWSS3Assets\BlobContainer', $bucket);
+    //     $this->assertInstanceOf('\UsmanMohammad\AzureStorageBlobAssets\BlobContainer', $container);
     // }
 }
